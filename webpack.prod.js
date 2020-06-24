@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        atomicassets: './src/index.ts',
+        atomicmarket: './src/index.ts',
     },
     mode: 'production',
     module: {

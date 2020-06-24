@@ -1,32 +1,28 @@
-export interface APIResult<T> {
-    success: boolean;
-    data: T;
-    query_time: number;
-}
+// Thanks to Hugo Martinez for the types
 
 export enum AuctionState {
-    Waiting,
-    Listed,
-    Canceled,
-    Sold,
-    Invalid
+    Waiting = 0,
+    Listed = 1,
+    Canceled = 2,
+    Sold = 3,
+    Invalid = 4
 }
 
 export enum SaleState {
-    Waiting,
-    Listed,
-    Canceled,
-    Sold,
-    Invalid
+    Waiting = 0,
+    Listed = 1,
+    Canceled = 2,
+    Sold = 3,
+    Invalid = 4
 }
 
 export enum OfferState {
-    Pending,
-    Invalid,
-    Unknown,
-    Accepted,
-    Declined,
-    Canceled
+    Pending = 0,
+    Invalid = 1,
+    Unknown = 2,
+    Accepted = 3,
+    Declined = 4,
+    Canceled = 5
 }
 
 export interface Sale {
@@ -76,7 +72,7 @@ export interface Config {
     version: string;
     maker_market_fee: number;
     taker_market_fee: number;
-    maximum_auction_duration: number,
+    maximum_auction_duration: number;
     minimum_bid_increase: number;
     supported_tokens: Token[];
     supported_pairs: Pair[];
@@ -109,20 +105,20 @@ export interface Auction {
 
 export enum SortOrder {
     Asc = 'asc',
-    Desc = 'desc',
+    Desc = 'desc'
 }
 
 export enum AuctionSort {
     Created = 'created',
     Ending = 'ending',
     AuctionId = 'auction_id',
-    Price = 'price',
+    Price = 'price'
 }
 
 export enum SaleSort {
     Created = 'created',
     SaleId = 'sale_id',
-    Price = 'price',
+    Price = 'price'
 }
 
 export enum AssetSort {
@@ -132,11 +128,11 @@ export enum AssetSort {
 }
 
 export enum TransferSort {
-    Created = 'created',
+    Created = 'created'
 }
 
 export enum OfferSort {
-    Created = 'created',
+    Created = 'created'
 }
 
 export interface AuctionParams extends Omit<SaleParams, 'state' | 'sort'> {
@@ -196,9 +192,20 @@ export interface TransferParams extends SearchParams {
 }
 
 export interface SearchParams {
-    page?: number;
-    limit?: number;
     order?: SortOrder;
+}
+
+export interface PriceParams {
+    collection_name?: string;
+    template_id?: number;
+    schema_name?: string;
+    symbol?: string;
+}
+
+export interface Price extends Token {
+    price: number;
+    block_time: number;
+    block_num: number;
 }
 
 export interface Token {
@@ -211,7 +218,7 @@ export interface Price extends Token {
     amount: number;
 }
 
-export interface ListingAsset extends Asset{
+export interface ListingAsset extends Asset {
     sales: Pick<Sale, 'market_contract' | 'sale_id'>[];
     auction: Pick<Auction, 'market_contract' | 'auction_id'>;
 }
@@ -317,4 +324,3 @@ export interface Bid {
     created_at_block: number;
     created_at_time: number;
 }
-
