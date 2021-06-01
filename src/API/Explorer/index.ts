@@ -111,7 +111,7 @@ export default class ExplorerApi {
     }
 
     async fetchEndpoint(path: string, args: any): Promise<any> {
-        let response;
+        let response, json;
 
         const f = this.fetchBuiltin;
         const queryString = Object.keys(args).map((key) => {
@@ -120,11 +120,11 @@ export default class ExplorerApi {
 
         try {
             response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
+
+            json = await response.json()
         } catch (e) {
             throw new ApiError(e.message, 500);
         }
-
-        const json = await response.json();
 
         if (response.status !== 200) {
             throw new ApiError(json.message, response.status);
