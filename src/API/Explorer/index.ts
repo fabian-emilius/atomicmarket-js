@@ -1,19 +1,32 @@
+import { AssetsApiParams, OfferApiParams, TransferApiParams } from 'atomicassets/build/API/Explorer/Params';
+import { ILog } from 'atomicassets/build/API/Explorer/Objects';
+
 import ApiError from '../../Errors/ApiError';
-import {
-    AssetLog,
-    AssetParams,
-    Auction,
-    AuctionParams,
-    Config, ListingAsset, ListingOffer, ListingTransfer,
-    Marketplace, OfferParams,
-    Price,
-    PriceParams,
-    Sale,
-    SaleParams, TransferParams
-} from './Types';
+import { AuctionApiParams, BaseAssetFilterParams, BuyofferApiParams, SaleApiParams } from './Params';
+import { IAuction, IBuyoffer, IMarketAsset, IMarketConfig, IMarketOffer, IMarketplace, IMarketToken, IMarketTransfer, IPriceStats, ISale } from './Objects';
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
-type ApiArgs = { fetch?: Fetch, rateLimit?: number };
+type ApiArgs = { fetch?: Fetch };
+
+export type DataOptions = Array<{key: string, value: any, type?: string}>;
+
+function buildDataOptions(options: {[key: string]: any}, data: DataOptions): {[key: string]: any} {
+    const dataFields: {[key: string]: string} = {};
+
+    for (const row of data) {
+        const dataType = row.type ?? 'data';
+
+        if (typeof row.value === 'number') {
+            dataFields[dataType + ':number.' + row.key] = String(row.value);
+        } else if (typeof row.value === 'boolean') {
+            dataFields[dataType + ':bool.' + row.key] = row.value ? 'true' : 'false';
+        } else {
+            dataFields[dataType + '.' + row.key] = row.value;
+        }
+    }
+
+    return Object.assign({}, options, dataFields);
+}
 
 export default class ExplorerApi {
     private readonly endpoint: string;
@@ -32,96 +45,134 @@ export default class ExplorerApi {
         }
     }
 
-    async getSales(options: SaleParams & {[key: string]: any} = {}, page: number = 1, limit: number = 100, data: {[key: string]: any} = {}): Promise<Sale[]> {
-        const dataKeys = Object.keys(data);
-
-        for (const key of dataKeys) {
-            options['data.' + key] = data[key];
-        }
-
-        return await this.fetchEndpoint('/v1/sales', {page, limit, ...options});
+    async getSales(options: SaleApiParams = {}, page: number = 1, limit: number = 100, data: DataOptions = []): Promise<ISale[]> {
+        return await this.fetchEndpoint('/v1/sales', {page, limit, ...buildDataOptions(options, data)});
     }
 
-    async getSale(id: string): Promise<Sale> {
+    async countSales(options: SaleApiParams, data: DataOptions = []): Promise<number> {
+        return await this.countEndpoint('/v1/sales', buildDataOptions(options, data));
+    }
+
+    async getSale(id: string): Promise<ISale> {
         return await this.fetchEndpoint('/v1/sales/' + id, {});
     }
 
-    async getAuctions(
-        options: AuctionParams & {[key: string]: any} = {}, page: number = 1, limit: number = 100, data: {[key: string]: any} = {}
-    ): Promise<Auction[]> {
-        const dataKeys = Object.keys(data);
-
-        for (const key of dataKeys) {
-            options['data.' + key] = data[key];
-        }
-
-        return await this.fetchEndpoint('/v1/auctions', {page, limit, ...options});
+    async getSaleLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ILog[]> {
+        return await this.fetchEndpoint('/v1/sales/' + id + '/logs', {page, limit, order});
     }
 
-    async getAuction(id: string): Promise<Auction> {
+    async getAuctions(options: AuctionApiParams = {}, page: number = 1, limit: number = 100, data: DataOptions = []): Promise<IAuction[]> {
+        return await this.fetchEndpoint('/v1/auctions', {page, limit, ...buildDataOptions(options, data)});
+    }
+
+    async countAuctions(options: AuctionApiParams, data: DataOptions = []): Promise<number> {
+        return await this.countEndpoint('/v1/auctions', buildDataOptions(options, data));
+    }
+
+    async getAuction(id: string): Promise<IAuction> {
         return await this.fetchEndpoint('/v1/auctions/' + id, {});
     }
 
-    async getMarketplaces(): Promise<Marketplace[]> {
+    async getAuctionLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ILog[]> {
+        return await this.fetchEndpoint('/v1/auctions/' + id + '/logs', {page, limit, order});
+    }
+
+    async getBuyoffers(options: BuyofferApiParams = {}, page: number = 1, limit: number = 100, data: DataOptions = []): Promise<IBuyoffer[]> {
+        return await this.fetchEndpoint('/v1/buyoffers', {page, limit, ...buildDataOptions(options, data)});
+    }
+
+    async countBuyoffers(options: BuyofferApiParams, data: DataOptions = []): Promise<number> {
+        return await this.countEndpoint('/v1/buyoffers', buildDataOptions(options, data));
+    }
+
+    async getBuyoffer(id: string): Promise<IBuyoffer> {
+        return await this.fetchEndpoint('/v1/buyoffers/' + id, {});
+    }
+
+    async getBuyofferLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ILog[]> {
+        return await this.fetchEndpoint('/v1/buyoffers/' + id + '/logs', {page, limit, order});
+    }
+
+    async getMarketplaces(): Promise<IMarketplace[]> {
         return await this.fetchEndpoint('/v1/marketplaces', {});
     }
 
-    async getMarketplace(name: string): Promise<Marketplace> {
+    async getMarketplace(name: string): Promise<IMarketplace> {
         return await this.fetchEndpoint('/v1/marketplaces/' + name, {});
     }
 
-    async getPrices(options: PriceParams = {}): Promise<Price[]> {
-        return await this.fetchEndpoint('/v1/prices', options);
-    }
-
-    async getConfig(): Promise<Config> {
+    async getConfig(): Promise<IMarketConfig> {
         return await this.fetchEndpoint('/v1/config', {});
     }
 
-    async getAssets(
-        options: AssetParams & {[key: string]: any} = {}, page: number = 1, limit: number = 100, data: { [key: string]: any} = {}
-    ): Promise<ListingAsset[]> {
-        const dataKeys = Object.keys(data);
-
-        for (const key of dataKeys) {
-            options['data.' + key] = data[key];
-        }
-
-        return await this.fetchEndpoint('/v1/assets', {page, limit, ...options});
+    /* PRICE API */
+    async getPriceHistory(
+        options: BaseAssetFilterParams & {symbol?: string} = {}
+    ): Promise<Array<IMarketToken & {sale_id?: string, auction_id?: string, buyoffer_id?: string, template_mint: string, price: string, block_time: string}>> {
+        return await this.fetchEndpoint('/v1/prices/sales', options);
     }
 
-    async getAsset(id: string): Promise<ListingAsset> {
+    async getPriceHistoryByDays(
+        options: BaseAssetFilterParams & {symbol?: string} = {}
+    ): Promise<Array<IMarketToken & {average: string, median: string, time: string}>> {
+        return await this.fetchEndpoint('/v1/prices/sales/days', options);
+    }
+
+    async getTemplatePriceStats(
+        options: BaseAssetFilterParams & {symbol?: string} = {}
+    ): Promise<Array<IMarketToken & IPriceStats & {collection_name: string, template_id: string}>> {
+        return await this.fetchEndpoint('/v1/prices/templates', options);
+    }
+
+    async getAssetPrices(
+        options: AssetsApiParams, data: DataOptions = []
+    ): Promise<Array<IMarketToken & IPriceStats>> {
+        return await this.fetchEndpoint('/v1/prices/assets', {...buildDataOptions(options, data)});
+    }
+
+    /* WRAPPED AtomicAssets APIs */
+    async getAssets(options: AssetsApiParams = {}, page: number = 1, limit: number = 100, data: DataOptions = []): Promise<IMarketAsset[]> {
+        return await this.fetchEndpoint('/v1/assets', {page, limit, ...buildDataOptions(options, data)});
+    }
+
+    async getAsset(id: string): Promise<IMarketAsset> {
         return await this.fetchEndpoint('/v1/assets/' + id, {});
     }
 
-    async getAssetLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<AssetLog[]> {
-        return await this.fetchEndpoint('/v1/assets/' + id + '/logs', {page, limit, order});
-    }
-
-    async getTransfers(options: TransferParams = {}, page: number = 1, limit: number = 100): Promise<ListingTransfer[]> {
+    async getTransfers(options: TransferApiParams = {}, page: number = 1, limit: number = 100): Promise<IMarketTransfer[]> {
         return await this.fetchEndpoint('/v1/transfers', {page, limit, ...options});
     }
 
-    async getOffers(options: OfferParams = {}, page: number = 1, limit: number = 100): Promise<ListingOffer[]> {
+    async getOffers(options: OfferApiParams = {}, page: number = 1, limit: number = 100): Promise<IMarketOffer[]> {
         return await this.fetchEndpoint('/v1/offers', {page, limit, ...options});
     }
 
-    async getOffer(id: string): Promise<ListingOffer> {
+    async getOffer(id: string): Promise<IMarketOffer> {
         return await this.fetchEndpoint('/v1/offers/' + id, {});
     }
 
-    async fetchEndpoint(path: string, args: any): Promise<any> {
+    async fetchEndpoint<T>(path: string, args: any): Promise<T> {
         let response, json;
 
         const f = this.fetchBuiltin;
         const queryString = Object.keys(args).map((key) => {
-            return key + '=' + encodeURIComponent(args[key]);
+            let value = args[key];
+
+            if (value === true) {
+                value = 'true';
+            }
+
+            if (value === false) {
+                value = 'false';
+            }
+
+            return key + '=' + encodeURIComponent(value);
         }).join('&');
 
         try {
             response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
 
-            json = await response.json()
+            json = await response.json();
         } catch (e) {
             throw new ApiError(e.message, 500);
         }
@@ -135,5 +186,11 @@ export default class ExplorerApi {
         }
 
         return json.data;
+    }
+
+    async countEndpoint(path: string, args: any): Promise<number> {
+        const res = await this.fetchEndpoint<string>(path + '/_count', args);
+
+        return parseInt(res, 10);
     }
 }

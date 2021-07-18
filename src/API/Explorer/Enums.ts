@@ -22,15 +22,6 @@ export enum BuyofferState {
     Invalid = 4
 }
 
-export enum OfferState {
-    Pending = 0,
-    Invalid = 1,
-    Unknown = 2,
-    Accepted = 3,
-    Declined = 4,
-    Canceled = 5
-}
-
 export enum SortOrder {
     Asc = 'asc',
     Desc = 'desc'

@@ -1,15 +1,22 @@
 {
   "name": "atomicmarket",
   "description": "js module to fetch data from the atomicmarket contract",
-  "keywords": ["atomicmarket", "atomicassets", "nft", "blockchain", "eosio", "pinknetwork"],
+  "keywords": [
+    "atomicmarket",
+    "atomicassets",
+    "nft",
+    "blockchain",
+    "eosio",
+    "pinknetwork"
+  ],
   "author": "pink.network",
   "homepage": "https://atomicmarket.io",
   "bugs": {
-    "url" : "https://github.com/pinknetworkx/atomicmarket-js/issues",
-    "email" : "pinknetworkx@gmail.com"
+    "url": "https://github.com/pinknetworkx/atomicmarket-js/issues",
+    "email": "pinknetworkx@gmail.com"
   },
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -19,22 +26,20 @@
     "lint": "tslint -p tsconfig.json",
     "test": "mocha -r ts-node/register test/**/*.test.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "atomicassets": "^1.4.0"
+  },
   "devDependencies": {
-    "@types/node": "^14.14.44",
-    "@types/mocha": "^8.2.2",
-    "@types/chai": "^4.2.18",
-    "ts-loader": "^9.1.2",
-    "ts-node": "^9.1.1",
+    "@types/node": "^14.17.5",
+    "node-fetch": "^2.6.1",
+    "ts-loader": "^9.2.3",
+    "ts-node": "^10.1.0",
     "tslint": "^5.20.1",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-origin-ordered-imports-rule": "^1.2.2",
-    "typescript": "^4.2.4",
-    "chai": "^4.3.4",
-    "mocha": "^8.4.0",
-    "webpack": "^5.37.0",
-    "webpack-cli": "^4.7.0",
-    "node-fetch": "^2.6.1"
+    "typescript": "^4.3.5",
+    "webpack": "^5.45.1",
+    "webpack-cli": "^4.7.2"
   }
 }
