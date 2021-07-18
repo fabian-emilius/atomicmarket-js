@@ -20,9 +20,9 @@ Web library can be found in the [dist](https://github.com/pinknetworkx/atomicmar
 
 ```javascript
 // standard import
-const {ExplorerApi} = require("atomicmarket");
+const {AtomicMarketApi} = require("atomicmarket");
 // ES6 import
-import {ExplorerApi} from "atomicmarket"
+import {AtomicMarketApi} from "atomicmarket"
 ```
 
 ## Documentation
@@ -40,26 +40,14 @@ It is recommended to self-host the API for the best performance.
 
 
 #### Example
+
 ```javascript
 // init Explorer Api
 // endpoint: server where atomicmarket api is deployed
 // namespace: used namespace for the API
 // options:
 // - fetch: either node-fetch module or the browser equivalent
-const api = new ExplorerApi("https://test.wax.api.atomicassets.io", "atomicmarket", {fetch});
+const api = new AtomicMarketApi("https://test.wax.api.atomicassets.io", "atomicmarket", {fetch});
 
-const asset = await api.getSale("100");
+const sale = await api.getSale("100");
 ```
-
-#### Methods
-
-Currently missing
-
-#### Types
-
-Each method returns the unmodified response from the API call. For more information look at the Models 
-on [the documentation](https://test.wax.api.atomicassets.io/atomicmarket/docs/swagger)
-
-### RpcApi
-
-Coming eventually

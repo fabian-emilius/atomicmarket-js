@@ -28,7 +28,7 @@ function buildDataOptions(options: {[key: string]: any}, data: DataOptions): {[k
     return Object.assign({}, options, dataFields);
 }
 
-export default class ExplorerApi {
+export default class AtomicMarketApi {
     private readonly endpoint: string;
     private readonly namespace: string;
 

@@ -1,3 +1,3 @@
-import ExplorerApi from './API/Explorer';
+import AtomicMarketApi from './API/Explorer';
 
-export { ExplorerApi };
+export { AtomicMarketApi };
